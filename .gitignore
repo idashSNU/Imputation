@@ -21,4 +21,7 @@ CMakeFiles/**
 Key2/**
 enc_impute
 Key/**
-plain/data_mod
+plain/data_mod/AFR_mod
+plain/data_mod/AMR_mod
+plain/data_mod/EUR_mod
+plain/data_mod/*.txt
