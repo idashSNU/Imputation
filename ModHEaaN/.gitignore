@@ -1,0 +1,16 @@
+# Ignore
+*.o
+*.dSYM
+.DS_Store
+doc/
+HEAAN_DEV/lib/libHEAAN.a
+HEAAN_DEV/test/UnitTest
+HEAAN_DEV/sample/Sample_Basic
+HEAAN_DEV/sample/Sample_Bootstrapping
+HEAAN_DEV/sample/Data/
+HEAAN_DEV/.vscode/
+HEAAN_DEV/.idea/
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
