@@ -1,7 +1,7 @@
 SNU Team IDASH2019
 
-This is a solution from the SNU team for HE-based genotype imputation. It consists of four directories: /HEAAN_NTT, /data_origin, /plain and /encrypted.
-/HEAAN_NTT includes a library which implements the CKKS homomorphic encryption scheme (without RNS), and /data_origin includes all snp data. In /plain directory, there are some python files that generates model files whose names start with 'New_gen_model_W_', and these models are saved in /encrypted directory. You can find our main code for HE-based genotype imputation in /encrypted. 
+This is a solution from the SNU team for HE-based genotype imputation. It consists of four directories: /ModHEaaN, /data_origin, /plain and /encrypted.
+/ModHEaaN includes a library which implements the CKKS homomorphic encryption scheme (without RNS), and /data_origin includes all snp data. In /plain directory, there are some python files that generates model files in name 'New_gen_model_W_*.py', and these models are saved in /encrypted directory. You can find our main code for HE-based genotype imputation in /encrypted. 
 
 
 The following is the way to build and run our solution:
