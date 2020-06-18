@@ -23,7 +23,7 @@ e.g. `$ ./enc_impute 40 80' runs imputation of 80k target SNPS, with window size
 * Note : The running time of (encrypted) imputation grows with 'window_size', but the quality of imputation (accuracy) does not. For the sample data, a moderate window size (about 40) shows the best result.
 
 * WARN: `populations' mode is only compatible with '80' (i.e., $ ./enc_impute populations 80)
-
+(yong: 지금상태로는 population은 command line argument로 못돌리는거 같은데 확인해야 할듯)
 
 3. Measure MicroAUC
 If you succeed to run our enc_impute solution (Step 2), then the score output file will be saved in /encrypted/impute_dnn in name 'score_window(window_size)__(# target snp in k)k.csv". Note that the real genotypes of test data is saved in /plain named as 'real_(# target snp in k)k.csv'.
@@ -39,4 +39,5 @@ $ cd plain
 $ python3 evaluation.py -i ../encrypted/impute_dnn/score_EUR_80k.csv -t real_EUR_80k.csv -o output_EUR.png
 $ python3 evaluation.py -i ../encrypted/impute_dnn/score_AMR_80k.csv -t real_AMR_80k.csv -o output_AMR.png
 $ python3 evaluation.py -i ../encrypted/impute_dnn/score_AFR_80k.csv -t real_AFR_80k.csv -o output_AFR.png
+(yong: 지금상태로는 population은 command line argument로 못돌리는거 같은데 확인해야 할듯)
 
