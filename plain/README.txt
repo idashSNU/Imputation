@@ -33,3 +33,5 @@ In function "DNNmodel", you can change the location of 1-hidden layer neural net
 * We support multiprocessing on training, where you can change the number of threads in codes.
 
 * WARN: To run our code with your own data, it should be one-hot-encoded. In other words, you have to convert the SNP data consisting of 0, 1, 2 into 100, 010, 001.
+
+
