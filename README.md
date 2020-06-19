@@ -5,10 +5,14 @@ This is a solution from the SNU team for privacy-preserving genotype imputation 
 
 ## Download Datasets
 
-At first, we need two groups of large data. Please follow steps below:
+At first, we need download four datasets "Total", "EUR", "AMR" and "AFR". Please follow steps below:
 1. Download original data files from [here](https://drive.google.com/drive/folders/1EVFLogAoqAajHxCBlen4vzy2Y0JbkpbU?usp=sharing) and save in folder `/data_origin`. 
 1. Download modified data files from [here](https://drive.google.com/drive/folders/15JNx48B-dUDoIr1eVNqegj2fmIMB9K9Y?usp=sharing) and save in folder `/plain/data_mod`.
 
+* Total: `/data_origin/*.txt`, '/plain/data_mod/Total_mod/*.txt'
+* EUR: `/data_origin/*_EUR.txt', '/plain/data_mod/EUR_mod/*.txt'
+* AMR: `/data_origin/*_AMR.txt', '/plain/data_mod/AMR_mod/*.txt'
+* AFR: `/data_origin/*_AFR.txt', '/plain/data_mod/AFR_mod/*.txt'
 
 ## Build Plain Models
 We generate 1-hidden layer neural network models for several datasets represented by "population". For each dataset, one can choose different models determined by "window_size", which denotes the number of adjacent tag SNPs for each target SNP. Experiments based on the given dataset shows that the choice "window_size = 40" provides the best accuracy of genotype imputation.
@@ -44,21 +48,27 @@ $ make all
 The executable file is generated as `enc_impute` in the directory `./encrypted/impute_dnn`. 
 
 ## Run the HE-imputation executable
-Choose two parameters, `window_size` and `number_of_targetSNP`. `window_size` is the number of adjacent tag SNPs for each target SNP, and `number_of_targetSNP` is literally the number of target SNPs. The choices of `window_size` and `number_of_targetSNP` are among (8 / 16 / 24 / ... / 72) and (20 / 40 / 80), respectively. 
+The command line to execute `enc_impute` depends on the target dataset. 
+### Total Dataset 
+Choose two parameters, `window_size` and `number_of_targetSNP`. `window_size` is the number of adjacent tag SNPs for each target SNP, and `number_of_targetSNP` is literally the number of target SNPs. The choices of `window_size` and `number_of_targetSNP` are among (8 / 16 / 24 / 32 / 40 / 48 / 56 / 64 / 72) and (20 / 40 / 80), respectively. 
 ```bash
 $ cd ./encrypted/impute_dnn
 $ ./enc_impute <window_size> <number_of_targetSNP>
 ```
-For instance, The argument below runs imputation of 80k target SNPS, with window size 40.
+For instance, The argument below runs the genotype imputation of 80k target SNPS, with window size 40.
 ```bash
 $ ./enc_impute 40 80
 ```
-
-* Note : The running time of (encrypted) imputation grows with `window_size`, but the quality of imputation (accuracy) does not. For the sample data, a moderate window size (about 40) shows the best result.
-* WARN: mode `populations` is only compatible with '80'. The command for poluation mod is as follow.
+### EUR/AMR/AFR Dataset
+In the case of EUR/AMR/AFR Dataset, the command line is fixed as 
 ```bash
 $ ./enc_impute populations 80
 ```
+The output will be genotype scores on EUR, AMR, and AFR datasets for the fixed `window_size=40` and `number_of_targetSNP=80`. 
+
+
+* NOTE: The running time linearly grows up in terms of `window_size`, but the accuracy does not. For the given datasets, the choice `window_size=40` shows the best accuracy.
+
 
 ## Measure the Accuracy (MicroAUC)
 If you succeed to run our solution, then the genotype score results of our solution "genotype_score" will be saved in `/encrypted/impute_dnn` denoted by `score_window(window_size)__(number_of_targetSNP)k.csv`. Note that the real genotypes of test data "genotype_real" is saved in `/plain` denoted by `real_number_of_targetSNP)k.csv`. To run  `evaluation.py` in the `./plain` directory, command
