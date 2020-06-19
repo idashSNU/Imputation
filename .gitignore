@@ -20,10 +20,10 @@ CMakeFiles/**
 Key2/**
 enc_impute
 Key/**
-plain/data_mod/AFR_mod
-plain/data_mod/AMR_mod
-plain/data_mod/EUR_mod
-plain/data_mod/*.txt
+plain/data_mod/AFR_mod/*.txt
+plain/data_mod/AMR_mod/*.txt
+plain/data_mod/EUR_mod/*.txt
+plain/data_mod/Total_mod/*.txt
 plain/data_mod/*.csv
 data_origin/population
 data_origin/README
