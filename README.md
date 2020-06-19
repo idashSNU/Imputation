@@ -49,17 +49,20 @@ The executable file is generated as `enc_impute` in the directory `./encrypted/i
 
 ## Run the HE-imputation executable
 The command line to execute `enc_impute` depends on the target dataset. 
-### Total Dataset 
-Choose two parameters, `window_size` and `number_of_targetSNP`. `window_size` is the number of adjacent tag SNPs for each target SNP, and `number_of_targetSNP` is literally the number of target SNPs. The choices of `window_size` and `number_of_targetSNP` are among (8 / 16 / 24 / 32 / 40 / 48 / 56 / 64 / 72) and (20 / 40 / 80), respectively. 
+### For Total Dataset 
+One need to choose two input arguments `window_size` and `number_of_targetSNP`: `window_size` is the number of adjacent tag SNPs for each target SNP, and `number_of_targetSNP` represents the number of target SNPs. 
 ```bash
 $ cd ./encrypted/impute_dnn
 $ ./enc_impute <window_size> <number_of_targetSNP>
 ```
+* window_size: 8, 16, 24, 32, 40, 48, 56, 64, 72
+* number_of_targetSNP: 20, 40, 80
+
 For instance, The argument below runs the genotype imputation of 80k target SNPS, with window size 40.
 ```bash
 $ ./enc_impute 40 80
 ```
-### EUR/AMR/AFR Dataset
+### For EUR/AMR/AFR Dataset
 In the case of EUR/AMR/AFR Dataset, the command line is fixed as 
 ```bash
 $ ./enc_impute populations 80
