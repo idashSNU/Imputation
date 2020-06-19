@@ -3,7 +3,7 @@
 This is a solution from the SNU team for privacy-preserving genotype imputation based on Homomorphic Encryption (HE). Basically it consists of four directories: `/ModHEaaN`, `/data_origin`, `/plain` and `/encrypted`. To run our HE-based genotype imputation solution, follow the instruction described below in order.
 
 
-## Download Original Data
+## Download Datasets
 
 At first, we need two groups of large data. Please follow steps below:
 1. Download original data files from [here](https://drive.google.com/drive/folders/1EVFLogAoqAajHxCBlen4vzy2Y0JbkpbU?usp=sharing) and save in folder `/data_origin`. 
