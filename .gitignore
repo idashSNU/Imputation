@@ -11,7 +11,6 @@ encrypted/Total_DNNmodels/DNNmodels_72_c/*.csv
 encrypted/EUR_DNNmodels/DNNmodels_40_c/*.csv
 encrypted/AMR_DNNmodels/DNNmodels_40_c/*.csv
 encrypted/AFR_DNNmodels/DNNmodels_40_c/*.csv
-bfg-1.13.0.jar
 /ModHEaaN/lib/libHEAAN.so
 *.json
 *.cmake
