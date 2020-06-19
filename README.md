@@ -9,7 +9,7 @@ You can find our main code for HE-based genotype imputation in `/encrypted`.
 ## Download Original Data
 
 At first, we need two groups of large data. Please follow steps below:
-1. Download original data files from [this link](https://drive.google.com/drive/folders1EVFLogAoqAajHxCBlen4vzy2Y0JbkpbU?usp=sharing) and save in folder `/data_origin`. 
+1. Download original data files from [this link](https://drive.google.com/drive/folders/1EVFLogAoqAajHxCBlen4vzy2Y0JbkpbU?usp=sharing) and save in folder `/data_origin`. 
 1. Download modified data files from [this link](https://drive.google.com/drive/folders/15JNx48B-dUDoIr1eVNqegj2fmIMB9K9Y?usp=sharing) and save in folder `/plain/data_mod`.
 
 
