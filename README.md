@@ -18,10 +18,30 @@ At first, we need two groups of large data. Please follow steps below:
 The following is the way to build and run our solution:
 
 ### Build plain model
-Plain model here
+We generate models for several datasets represented by "population". For each dataset, one can choose different models determined by "window_size", which denotes the number of adjacent tag SNPs for each target SNP. Experiments based on the given dataset shows that the choice "window_size = 40" provides the best accuracy of genotype imputation.
+Note that the larger "window_size" implies the higher computational cost. We also provide the multi-processing option for the acceleration so that one can dynamically choose the number of processes based on his/her computer environment.
+
+To generate the imputation models, command the following:
+```bash
+$ cd ./plain
+$ python New_gen_model_W.py -p <population> -w <window_size> -n <number_of_processes>
+```
+* population: Total, EUR, AMR, AFR 
+* window_size: 8, 16, 24, 32, 40, 48, 56, 64, 72 
+* number_of_processes: 1, 2, 4, 8, 16 
+
+The generated plain models will be saved in the directory `/encrypted/<population>_DNNmodels/DNNmodels_<window_size>_c`.
 
 ### Build ModHEaaN
-ModHeean Here
+For the encryption of test data, we use the [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) library, which is a light-version implementation of the approximate HE scheme [CKKS](https://eprint.iacr.org/2016/421.pdf). Contrary to [HEAAN](https://github.com/snucrypto/HEAAN), [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) does not have any dependency on multi-precision libraries GMP and NTL, and only support homomorphic addition and constant multiplication (hence bootstrapping disabled).
+
+To build [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN), command the following:
+```bash
+$./ModHEaaN/heaan
+$ cmake CMakeLists.txt
+$ make all
+```
+
 
 ### Build HE-imputation executable by
 ```bash
@@ -32,7 +52,7 @@ $ make all
 ### Run
 Choose two parameters, `window_size` and ``. `window_size` is the number of nearby (known) SNPs used for each target SNP, and `number_of_targetSNP` is literally the number of target SNPs. The choices of `window_size` and `number_of_targetSNP` are among (8 / 16 / 24 / ... / 72) and (20 / 40 / 80), respectively. The executable with command line arguments by
 ```bash
-$ ./enc_impute window_size number_of_targetSNP
+$ ./enc_impute <window_size> <number_of_targetSNP>
 ```
 For instance, The argument below runs imputation of 80k target SNPS, with window size 40.
 ```bash
