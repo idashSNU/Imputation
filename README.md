@@ -9,10 +9,10 @@ At first, we need download four datasets "Total", "EUR", "AMR" and "AFR". Please
 1. Download original data files from [here](https://drive.google.com/drive/folders/1EVFLogAoqAajHxCBlen4vzy2Y0JbkpbU?usp=sharing) and save in folder `/data_origin`. 
 1. Download modified data files from [here](https://drive.google.com/drive/folders/15JNx48B-dUDoIr1eVNqegj2fmIMB9K9Y?usp=sharing) and save in folder `/plain/data_mod`.
 
-* Total: `/data_origin/*.txt`, '/plain/data_mod/Total_mod/*.txt'
-* EUR: `/data_origin/*_EUR.txt', '/plain/data_mod/EUR_mod/*.txt'
-* AMR: `/data_origin/*_AMR.txt', '/plain/data_mod/AMR_mod/*.txt'
-* AFR: `/data_origin/*_AFR.txt', '/plain/data_mod/AFR_mod/*.txt'
+* Total: `/data_origin/*.txt`, `/plain/data_mod/Total_mod/*.txt`
+* EUR: `/data_origin/*_EUR.txt`, `/plain/data_mod/EUR_mod/*.txt`
+* AMR: `/data_origin/*_AMR.txt`, `/plain/data_mod/AMR_mod/*.txt`
+* AFR: `/data_origin/*_AFR.txt`, `/plain/data_mod/AFR_mod/*.txt`
 
 ## Build Plain Models
 We generate 1-hidden layer neural network models for several datasets represented by "population". For each dataset, one can choose different models determined by "window_size", which denotes the number of adjacent tag SNPs for each target SNP. Experiments based on the given dataset shows that the choice "window_size = 40" provides the best accuracy of genotype imputation.
