@@ -1,16 +1,16 @@
-# SNU Team IDASH2019
+# Privacy-preserving Genotype Imputation based on Homomorphic Encryption
 
 ### Introduction
 
-This is a solution from the SNU team for HE-based genotype imputation. It consists of four directories: `/ModHEaaN`, `/data_origin`, `/plain` and `/encrypted`.
-`/ModHEaaN` includes a library which implements the CKKS homomorphic encryption scheme (without RNS). In `/plain` directory, there are some python files that generates model files in name `New_gen_model_W_*.py`, and these models are saved in `/encrypted` directory. The original data should be downloaded from external link.
+This is a solution from the SNU team for privacy-preserving genotype imputation based on Homomorphic Encryption (HE). Basically it consists of four directories: `/ModHEaaN`, `/data_origin`, `/plain` and `/encrypted`.
+`/ModHEaaN` includes an HE library [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) which implements an approximate HE scheme [CKKS](https://eprint.iacr.org/2016/421.pdf). In `/plain` directory, there are some python files that generates model files in name `New_gen_model_W_*.py`, and these models are saved in `/encrypted` directory. The original data should be downloaded from external link.
 You can find our main code for HE-based genotype imputation in `/encrypted`. 
 
 ## Download Original Data
 
 At first, we need two groups of large data. Please follow steps below:
-1. Download original data files from [this link](https://drive.google.com/drive/folders/1EVFLogAoqAajHxCBlen4vzy2Y0JbkpbU?usp=sharing) and save in folder `/data_origin`. 
-1. Download modified data files from [this link](https://drive.google.com/drive/folders/15JNx48B-dUDoIr1eVNqegj2fmIMB9K9Y?usp=sharing) and save in folder `/plain/data_mod`.
+1. Download original data files from [here](https://drive.google.com/drive/folders/1EVFLogAoqAajHxCBlen4vzy2Y0JbkpbU?usp=sharing) and save in folder `/data_origin`. 
+1. Download modified data files from [here](https://drive.google.com/drive/folders/15JNx48B-dUDoIr1eVNqegj2fmIMB9K9Y?usp=sharing) and save in folder `/plain/data_mod`.
 
 
 ## how to Run
@@ -33,25 +33,27 @@ $ python New_gen_model_W.py -p <population> -w <window_size> -n <number_of_proce
 The generated plain models will be saved in the directory `/encrypted/<population>_DNNmodels/DNNmodels_<window_size>_c`.
 
 ### Build ModHEaaN
-For the encryption of test data, we use the [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) library, which is a light-version implementation of the approximate HE scheme [CKKS](https://eprint.iacr.org/2016/421.pdf). Contrary to [HEAAN](https://github.com/snucrypto/HEAAN), [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) does not have any dependency on multi-precision libraries GMP and NTL, and only support homomorphic addition and constant multiplication (hence bootstrapping disabled).
+For the encryption of test data, we use the [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) library, which is a light-version implementation of the approximate HE scheme [CKKS](https://eprint.iacr.org/2016/421.pdf). Contrary to the original implementation of the [CKKS](https://eprint.iacr.org/2016/421.pdf) scheme [HEAAN](https://github.com/snucrypto/HEAAN), our [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) library does not have any dependency on multi-precision libraries GMP and NTL, and only supports homomorphic addition and constant multiplication (hence bootstrapping disabled).
 
 To build [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN), command the following:
 ```bash
-$./ModHEaaN/heaan
+$ ./ModHEaaN/heaan
 $ cmake CMakeLists.txt
 $ make all
 ```
-
 
 ### Build HE-imputation executable by
 ```bash
-$./encrypted/impute_dnn
+$ ./encrypted/impute_dnn
 $ cmake CMakeLists.txt
 $ make all
 ```
+The executable file is generated as `enc_impute` in the directory `./encrypted/impute_dnn`. 
+
 ### Run
-Choose two parameters, `window_size` and ``. `window_size` is the number of nearby (known) SNPs used for each target SNP, and `number_of_targetSNP` is literally the number of target SNPs. The choices of `window_size` and `number_of_targetSNP` are among (8 / 16 / 24 / ... / 72) and (20 / 40 / 80), respectively. The executable with command line arguments by
+Choose two parameters, `window_size` and `number_of_targetSNP`. `window_size` is the number of adjacent tag SNPs for each target SNP, and `number_of_targetSNP` is literally the number of target SNPs. The choices of `window_size` and `number_of_targetSNP` are among (8 / 16 / 24 / ... / 72) and (20 / 40 / 80), respectively. 
 ```bash
+$ cd ./encrypted/impute_dnn
 $ ./enc_impute <window_size> <number_of_targetSNP>
 ```
 For instance, The argument below runs imputation of 80k target SNPS, with window size 40.
