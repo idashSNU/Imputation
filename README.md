@@ -5,7 +5,7 @@ This is a solution from the SNU team for privacy-preserving genotype imputation 
 
 ## Download Datasets
 
-At first, we need download four datasets "Total", "EUR", "AMR" and "AFR". Please follow steps below:
+At first, we need to download four datasets "Total", "EUR", "AMR" and "AFR". Please follow the steps below:
 1. Download original data files from [here](https://drive.google.com/drive/folders/1EVFLogAoqAajHxCBlen4vzy2Y0JbkpbU?usp=sharing) and save in folder `/data_origin`. 
 1. Download modified data files from [here](https://drive.google.com/drive/folders/15JNx48B-dUDoIr1eVNqegj2fmIMB9K9Y?usp=sharing) and save in folder `/plain/data_mod`.
 
@@ -15,22 +15,22 @@ At first, we need download four datasets "Total", "EUR", "AMR" and "AFR". Please
 * AFR: `/data_origin/*_AFR.txt`, `/plain/data_mod/AFR_mod/*.txt`
 
 ## Build Plain Models
-We generate 1-hidden layer neural network models for several datasets represented by "population". For each dataset, one can choose different models determined by "window_size", which denotes the number of adjacent tag SNPs for each target SNP. Experiments based on the given dataset shows that the choice "window_size = 40" provides the best accuracy of genotype imputation.
-Note that the larger "window_size" implies the higher computational cost. We also provide the multi-processing option for the acceleration so that one can dynamically choose the number of processes based on his/her computer environment.
+We generate 1-hidden layer neural network models for several datasets represented by *population*. For each dataset, one can choose different models determined by *window_size*, which denotes the number of adjacent tag SNPs for each target SNP. Experiments based on the given dataset shows that the choice *window_size = 40* provides the best accuracy of genotype imputation.
+Note that the larger *window_size* implies the higher computational cost. We also provide the multi-processing option for the acceleration so that one can dynamically choose the number of processes based on his/her computer environment.
 
 To generate the imputation models, command the following:
 ```bash
 $ cd ./plain
 $ python New_gen_model_W.py -p <population> -w <window_size> -n <number_of_processes>
 ```
-* population: Total, EUR, AMR, AFR 
-* window_size: 8, 16, 24, 32, 40, 48, 56, 64, 72 
-* number_of_processes: 1, 2, 4, 8, 16 
+* `population`: Total, EUR, AMR, AFR 
+* `window_size`: 8, 16, 24, 32, 40, 48, 56, 64, 72 
+* `number_of_processes`: 1, 2, 4, 8, 16 
 
 The generated plain models will be saved in the `/encrypted/<population>_DNNmodels/DNNmodels_<window_size>_c` directory.
 
 ## Build ModHEaaN
-For the encryption of test data, we use the [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) library, which is a light-version implementation of the approximate HE scheme [CKKS](https://eprint.iacr.org/2016/421.pdf). Contrary to the original implementation of the [CKKS](https://eprint.iacr.org/2016/421.pdf) scheme [HEAAN](https://github.com/snucrypto/HEAAN), our [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) library does not have any dependency on multi-precision libraries GMP and NTL, and only supports homomorphic addition and constant multiplication (hence bootstrapping disabled).
+For the encryption of test data, we use the [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) library, which is a light-version implementation of the approximate HE scheme [CKKS](https://eprint.iacr.org/2016/421.pdf). Contrary to the original implementation of the [CKKS](https://eprint.iacr.org/2016/421.pdf) scheme [HEAAN](https://github.com/snucrypto/HEAAN), our [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) library does not have any dependency on multi-precision libraries GMP and NTL, and only supports homomorphic addition and 1-depth constant multiplication (hence bootstrapping disabled).
 
 To build [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN), command the following:
 ```bash
@@ -39,7 +39,7 @@ $ cmake CMakeLists.txt
 $ make all
 ```
 
-## Build the HE-imputation executable by
+## Build the HE-based Genotype Imputation executable
 ```bash
 $ ./encrypted/impute_dnn
 $ cmake CMakeLists.txt
@@ -47,10 +47,10 @@ $ make all
 ```
 The executable file is generated as `enc_impute` in the directory `./encrypted/impute_dnn`. 
 
-## Run the HE-imputation executable
+## Run `enc_impute`
 The command line to execute `enc_impute` depends on the target dataset. 
 ### For Total Dataset 
-One need to choose two input arguments `window_size` and `number_of_targetSNP`: `window_size` is the number of adjacent tag SNPs for each target SNP, and `number_of_targetSNP` represents the number of target SNPs. 
+One need to choose two input arguments `window_size` and `number_of_targetSNP`. `window_size` is the number of adjacent tag SNPs for each target SNP, and `number_of_targetSNP` represents the number of target SNPs. 
 ```bash
 $ cd ./encrypted/impute_dnn
 $ ./enc_impute <window_size> <number_of_targetSNP>
@@ -58,7 +58,7 @@ $ ./enc_impute <window_size> <number_of_targetSNP>
 * window_size: 8, 16, 24, 32, 40, 48, 56, 64, 72
 * number_of_targetSNP: 20, 40, 80
 
-For instance, The argument below runs the genotype imputation of 80k target SNPS, with window size 40.
+For instance, The argument below runs the genotype imputation of 80k target SNPs, with window size 40.
 ```bash
 $ ./enc_impute 40 80
 ```
