@@ -178,7 +178,7 @@ def DNNmodel(numbering, ll):
         # W = w1
     # The storage location of model W
 
-    W.to_csv('../encrypted/'+str(ll.population)+'_DNNmodels/DNNmodels_' + str(ll.window_size) + '/W_New' + str(numbering)  + '.csv', header = False, index =False)
+    W.to_csv('../encrypted/'+str(ll.population)+'_DNNmodels/DNNmodels_' + str(ll.window_size) + '_c/W_New' + str(numbering)  + '.csv', header = False, index =False)
     
     del W
     del w1
