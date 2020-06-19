@@ -79,13 +79,13 @@ If you succeed to run our solution, then the genotype score results of our solut
 python3 evaluation.py -i <genotype_score> -t <genotype_real> -o output.png
 ```
 
-e.g. After running `$ ./enc_impute 40 80` in Step 2, then
+e.g. After running `$ ./enc_impute 40 80` in the previous step, then
 ```bash
 $ cd ./plain
 $ python3 evaluation.py -i ../encrypted/impute_dnn/score_window40_80k.csv -t real_80k.csv -o output.png
 ```
 
-e.g. After running `$ ./enc_impute populations 80` in Step 2, then
+e.g. After running `$ ./enc_impute populations 80` in the previous step, then
 ```bash
 $ cd ./plain
 $ python3 evaluation.py -i ../encrypted/impute_dnn/score_EUR_80k.csv -t real_EUR_80k.csv -o output_EUR.png
