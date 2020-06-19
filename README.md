@@ -1,7 +1,5 @@
 # Privacy-preserving Genotype Imputation based on Homomorphic Encryption
 
-### Introduction
-
 This is a solution from the SNU team for privacy-preserving genotype imputation based on Homomorphic Encryption (HE). Basically it consists of four directories: `/ModHEaaN`, `/data_origin`, `/plain` and `/encrypted`. To run our HE-based genotype imputation solution, follow the instruction described below in order.
 
 
