@@ -69,14 +69,21 @@ int main(int argc, char* argv[])
     bool olddata = 0;               // default setting
     // olddata = atoi(argv[5]);
     bool population = 0;            // default setting
-    
-    string mode = argv[1];
+    if(!string(argv[1]).compare("populations")) population = 1;
+
     long num_target_snp_k = atoi(argv[2]);
 
     long logp = 17;
     long max_num_sample = 1024;
+    
+    long window = 40;
+    string mode; 
 
-    long window = stoi(argv[1]);
+    if(!population)
+	window = stoi(argv[1]);
+    else
+	mode = argv[1];
+
     // if (mode == "fast") window = 8;
     // else if (mode == "balanced") window = 24;
     // else {
