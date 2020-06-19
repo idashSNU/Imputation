@@ -12,11 +12,7 @@ At first, we need two groups of large data. Please follow steps below:
 1. Download modified data files from [here](https://drive.google.com/drive/folders/15JNx48B-dUDoIr1eVNqegj2fmIMB9K9Y?usp=sharing) and save in folder `/plain/data_mod`.
 
 
-## How to Run?
-
-The following is the way to build and run our solution.
-
-### Build Plain Models
+## Build Plain Models
 We generate 1-hidden layer neural network models for several datasets represented by "population". For each dataset, one can choose different models determined by "window_size", which denotes the number of adjacent tag SNPs for each target SNP. Experiments based on the given dataset shows that the choice "window_size = 40" provides the best accuracy of genotype imputation.
 Note that the larger "window_size" implies the higher computational cost. We also provide the multi-processing option for the acceleration so that one can dynamically choose the number of processes based on his/her computer environment.
 
@@ -31,7 +27,7 @@ $ python New_gen_model_W.py -p <population> -w <window_size> -n <number_of_proce
 
 The generated plain models will be saved in the `/encrypted/<population>_DNNmodels/DNNmodels_<window_size>_c` directory.
 
-### Build ModHEaaN
+## Build ModHEaaN
 For the encryption of test data, we use the [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) library, which is a light-version implementation of the approximate HE scheme [CKKS](https://eprint.iacr.org/2016/421.pdf). Contrary to the original implementation of the [CKKS](https://eprint.iacr.org/2016/421.pdf) scheme [HEAAN](https://github.com/snucrypto/HEAAN), our [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) library does not have any dependency on multi-precision libraries GMP and NTL, and only supports homomorphic addition and constant multiplication (hence bootstrapping disabled).
 
 To build [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN), command the following:
@@ -41,7 +37,7 @@ $ cmake CMakeLists.txt
 $ make all
 ```
 
-### Build the HE-imputation executable by
+## Build the HE-imputation executable by
 ```bash
 $ ./encrypted/impute_dnn
 $ cmake CMakeLists.txt
@@ -49,7 +45,7 @@ $ make all
 ```
 The executable file is generated as `enc_impute` in the directory `./encrypted/impute_dnn`. 
 
-### Run the HE-imputation executable
+## Run the HE-imputation executable
 Choose two parameters, `window_size` and `number_of_targetSNP`. `window_size` is the number of adjacent tag SNPs for each target SNP, and `number_of_targetSNP` is literally the number of target SNPs. The choices of `window_size` and `number_of_targetSNP` are among (8 / 16 / 24 / ... / 72) and (20 / 40 / 80), respectively. 
 ```bash
 $ cd ./encrypted/impute_dnn
@@ -66,7 +62,7 @@ $ ./enc_impute 40 80
 $ ./enc_impute populations 80
 ```
 
-### Measure the Accuracy (MicroAUC)
+## Measure the Accuracy (MicroAUC)
 If you succeed to run our solution, then the genotype score results of our solution "genotype_score" will be saved in `/encrypted/impute_dnn` denoted by `score_window(window_size)__(number_of_targetSNP)k.csv`. Note that the real genotypes of test data "genotype_real" is saved in `/plain` denoted by `real_number_of_targetSNP)k.csv`. To run  `evaluation.py` in the `./plain` directory, command
 ```bash
 python3 evaluation.py -i <genotype_score> -t <genotype_real> -o output.png
