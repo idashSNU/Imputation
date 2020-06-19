@@ -74,7 +74,7 @@ The output will be genotype scores on EUR, AMR, and AFR datasets for the fixed `
 
 
 ## Measure the Accuracy (MicroAUC)
-If you succeed to run our solution, then the genotype score results of our solution "genotype_score" will be saved in `/encrypted/impute_dnn` denoted by `score_window(window_size)__(number_of_targetSNP)k.csv`. Note that the real genotypes of test data "genotype_real" is saved in `/plain` denoted by `real_number_of_targetSNP)k.csv`. To run  `evaluation.py` in the `./plain` directory, command
+If you succeed to run our solution, then the genotype score results of our solution "genotype_score" will be saved in `/encrypted/impute_dnn` denoted by `score_window<window_size>_<number_of_targetSNP>k.csv`. Note that the real genotypes of test data "genotype_real" is saved in `/plain` denoted by `real_<number_of_targetSNP>k.csv`. To run  `evaluation.py` in the `./plain` directory, command
 ```bash
 python3 evaluation.py -i <genotype_score> -t <genotype_real> -o output.png
 ```
