@@ -40,6 +40,18 @@ void runEvaluation(Evaluator& evaluator, string tag_filename, SNP_Parameters& sn
     evaluator.compute_XW_imag_nosave_newdata(EncX, W, snp_params, EncXW);
     timeutils.stop("compute_XW_imag_nosave");
     
+    for (int i = 0; i < snp_params.num_target_snp; i++) {
+	for (int j = 0; j < snp_params.list_nSNP_tag[i]; j++) {
+	    delete[] W[i][j];
+	}
+    	delete[] W[i];
+    }
+    delete[] W;
+	
+    for (int i = 0; i < (3 * snp_params.num_tag_snp + 1) / 2; i++) {
+	delete[] EncX[i];
+    }
+    delete[] EncX;
 
     // result_matrix = new Message**[snp_params.num_target_snp];
     // for (int i = 0; i < snp_params.num_target_snp; i++) {
