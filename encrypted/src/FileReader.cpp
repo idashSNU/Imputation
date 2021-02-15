@@ -29,7 +29,7 @@ void FileReader::readMatrix(const string input_filename, double** mat, long colu
             }
         }
     } else {
-        cout << "Error: cannot read file" << endl;
+        cout << "[FileReader::readMatrix1] Error: cannot read file" << endl;
     }
 }
 
@@ -58,7 +58,8 @@ void FileReader::readMatrix(const string input_filename, string** mat, long colu
             }
         }
     } else {
-        cerr << "Error: cannot read file" << endl;
+        cout << "[FileReader::readMatrix2] Error: cannot read file" << endl;
+        cin.ignore();
     }
 }
 
@@ -94,7 +95,9 @@ void FileReader::readMatrixWithData(const string input_filename, double** mat, v
             }
         }
     } else {
-        cerr << "Error: cannot read file" << endl;
+        cout << "[FileReader::readMatrixWithData] Error: cannot read file" << endl;
+        cin.ignore();
+
     }
 }
 
@@ -128,7 +131,9 @@ void FileReader::readMatrix(const string input_filename, double** mat, long& col
             }
         }
     } else {
-        cerr << "Error: cannot read file" << endl;
+        cout << "[FileReader::readMatrix3] Error: cannot read file" << endl;
+        cin.ignore();
+
     }
 }
 
@@ -213,8 +218,13 @@ vector<string> FileReader::split(string str, char delimiter)
 
 void FileReader::read_x_start(SNP_Parameters& snp_params)
 {
-    string filename = "../window_location/window" + to_string(snp_params.window) + ".txt";
-    cout << "[SNP_Parameters::read_x_start] read window " << snp_params.window << " from " << filename << endl;
+    string filename;
+    if (snp_params.num_target_snp_k <= 80) {
+        filename = "../window_location/window" + to_string(snp_params.window) + "_80k.txt";
+    } else {
+        filename = "../window_location/window" + to_string(snp_params.window) + "_117k.txt";
+    }
+    cout << "[FileReader::read_x_start] read window " << snp_params.window << " from " << filename << endl;
     ifstream openFile(filename.data());
     long count_row = 0;
     long count_col = 0;
@@ -229,7 +239,8 @@ void FileReader::read_x_start(SNP_Parameters& snp_params)
             }
             count_row++;
         }
-        cout << "[SNP_Parameters::read_x_start] check difference" << endl;
+        cout << "[FileReader::read_x_start] number of column = " << count_col << endl;
+        cout << "[FileReader::read_x_start] check difference : " << endl;
         for (int j = 0; j < count_col; j++) {
             // long origin = snp_params.list_x_start_full[i];
             // if (origin != xline[i]) {
@@ -237,7 +248,6 @@ void FileReader::read_x_start(SNP_Parameters& snp_params)
             // }
             snp_params.list_x_start_full[j] = xline[j];
         }
-        cout << "number of column = " << count_col << endl;
     } else {
         cout << "[SNP_Parameters::read_x_start] Error: cannot read file for window " << snp_params.window << endl;
     }
