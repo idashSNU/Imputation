@@ -8,6 +8,7 @@ This is a solution from the SNU team for privacy-preserving genotype imputation 
 At first, we need to download four datasets "Total", "EUR", "AMR" and "AFR". Please follow the steps below:
 1. Download original data files from [here](https://drive.google.com/drive/folders/1lLynN5dyh9nyqYIrWt1Wm5kUCoqZE0Vs?usp=sharing) and save in folder `/data_origin`. 
 1. Download modified data files from [here](https://drive.google.com/drive/folders/1HfcYFgt0H3dFzdazVL0AjpQUwNVYuNjf?usp=sharing) and save in folder `/plain/data_mod`.
+1. (Optional) Download modified data files for low from Minor Allele Frequency data from [here](https://drive.google.com/drive/folders/1ZprQwkqOS4CVMe4HhAo0-831f5j6UHD6?usp=sharing) and save in folder `/plain/data_mod_lowMAF`.
 
 * Total: `/data_origin/*.txt`, `/plain/data_mod/Total_mod/*.txt`
 * EUR: `/data_origin/*_EUR.txt`, `/plain/data_mod/EUR_mod/*.txt`
@@ -31,7 +32,12 @@ The generated plain models will be saved in the `/encrypted/<population>_DNNmode
 
 ### Model for Low Minor Allele Frequency data
 
-We have added the model for data with low minor allele frequency (MAF). This data consists of 117k number of target SNPs. To run with low MAF data, run New_gen_model_w_117k instead of original one and `population`=Total. Then, the generated plain models will be saved in the `/encrypted/Total_DNNmodels/DNNmodels_lowMAF_<window_size>` directory.
+We have added the model for data with low minor allele frequency (MAF). This data consists of 117k number of target SNPs. To run with low MAF data, run with additional option `-l 1` with `population`=Total. Then, the generated plain models will be saved in the `/encrypted/Total_DNNmodels/DNNmodels_lowMAF_<window_size>` directory.
+
+```bash
+$ cd ./plain
+$ python New_gen_model_W.py -p Total -w <window_size> -n <number_of_processes> -l 1
+```
 
 
 ## Build ModHEaaN
@@ -68,7 +74,7 @@ For instance, The argument below runs the genotype imputation of 80k target SNPs
 $ ./enc_impute 40 80
 ```
 
-When you want to deal with low MAF data, define `number_of_targetSNP` = 117, then the other parameters are the same as original `Total` data.
+When you want to deal with low MAF data, When you want to deal with low MAF data, define number_of_targetSNP = 117 and set the other parameters by the same as original Total data.
 
 ### For EUR/AMR/AFR Dataset
 In the case of EUR/AMR/AFR Dataset, the command line is fixed as 
@@ -99,4 +105,10 @@ $ cd ./plain
 $ python3 evaluation.py -i ../encrypted/impute_dnn/score_EUR_80k.csv -t real_EUR_80k.csv -o output_EUR.png
 $ python3 evaluation.py -i ../encrypted/impute_dnn/score_AMR_80k.csv -t real_AMR_80k.csv -o output_AMR.png
 $ python3 evaluation.py -i ../encrypted/impute_dnn/score_AFR_80k.csv -t real_AFR_80k.csv -o output_AFR.png
+```
+
+e.g. (For low MAF data) After running `$ ./enc_impute 40 117` in the previous step, then
+```bash
+$ cd ./plain
+$ python3 evaluation.py -i ../encrypted/impute_dnn/score_window40_117k.csv -t real_117k.csv -o output.png
 ```
