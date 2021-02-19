@@ -12,7 +12,15 @@ from keras import backend as K
 from multiprocessing import Process, Queue
 
 class locationList:
-    def __init__(self, file_name, window_size, population):
+    def __init__(self, window_size, population, lowMAF):
+        
+        if not lowMAF:
+            file_name = "data_mod/idash_local.csv"
+            self.snp_num = 83072
+        else: # window_size == 117
+            file_name = "data_mod_lowMAF/idash_local.csv"
+            self.snp_num = 117904
+
         data_df = read_data2(file_name)
         self.population = population
         self.window_size = window_size
@@ -20,7 +28,7 @@ class locationList:
         self.num_list_x_start = []
         self.num_list_x_end = []
         # you can change the number of adjacent tag SNPs. This value affects accuracy and time.
-        self.num_list_x_start, self.num_list_x_end = split_data(data_df, window_size)
+        self.num_list_x_start, self.num_list_x_end = split_data(data_df, self.window_size, self.snp_num)
 
         # print num_list_x_start
         
@@ -28,17 +36,25 @@ class locationList:
         self.num_list_y_end = []
 
         # the number of target SNPs
-        for j in range(0, 83072):
+        for j in range(0, self.snp_num):
             self.num_list_y_start.append(j)
             self.num_list_y_end.append(j)
 
         print("file reading starts...")
-        data_X_train = read_data("data_mod/"+ str(self.population)+"_mod/target_training_"+ str(self.population) +"_mod.txt")
-        data_X_test = read_data("data_mod/"+ str(self.population)+"_mod/target_testing_"+ str(self.population) +"_mod.txt")
-        self.data_Y_1 = [data_X_train, data_X_test]
-        data_Y_train = read_data("data_mod/"+ str(self.population)+"_mod/tag_training_"+ str(self.population) +"_mod.txt")
-        data_Y_test = read_data("data_mod/"+ str(self.population)+"_mod/tag_testing_"+ str(self.population) +"_mod.txt")
-        self.data_X_1 = [data_Y_train, data_Y_test]
+        if not lowMAF:
+            data_Y_train = read_data("data_mod/"+ str(self.population)+"_mod/target_training_"+ str(self.population) +"_mod.txt")
+            data_Y_test = read_data("data_mod/"+ str(self.population)+"_mod/target_testing_"+ str(self.population) +"_mod.txt")
+            data_X_train = read_data("data_mod/"+ str(self.population)+"_mod/tag_training_"+ str(self.population) +"_mod.txt")
+            data_X_test = read_data("data_mod/"+ str(self.population)+"_mod/tag_testing_"+ str(self.population) +"_mod.txt")
+        else: 
+            data_Y_train = read_data("data_mod_lowMAF/target_training_mod.txt")
+            data_Y_test = read_data("data_mod_lowMAF/target_testing_mod.txt")
+            data_X_train = read_data("data_mod_lowMAF/tag_training_mod.txt")
+            data_X_test = read_data("data_mod_lowMAF/tag_testing_mod.txt")
+        self.data_X_1 = [data_X_train, data_X_test]
+        self.data_Y_1 = [data_Y_train, data_Y_test]
+
+
         print("file reading ends!")
 
 
@@ -81,6 +97,7 @@ def nogada_data(np_array, start1, end1):
 # read the SNP location data.
 
 def read_data2(file_name):
+    print("read ", file_name)
     data_df = pd.read_csv(file_name)
     return data_df
 
@@ -92,12 +109,14 @@ def max(a, b):
         return b
 
 # split tag SNPs for each target SNP
-
-def split_data(data_df, window):
+def split_data(data_df, window, snp_num):
 
     # the name of category of location
     name_data_X = ['tag(total 16184)']   
-    name_data_Y = ['target(total 83073)']
+    if snp_num == 83072:
+        name_data_Y = ['target(total 83073)']
+    else:
+        name_data_Y = ['target(total 117904)']
    
     X = np.array(data_df[name_data_X])
     Y = np.array(data_df[name_data_Y])
@@ -112,9 +131,8 @@ def split_data(data_df, window):
     end_pt = window-1;
 
     index_speed = 0
-
     # This work find the adjacent tag SNPs for each target SNPs. Therefore, iteration number is the number of target SNPs.
-    for i in range(0, 83072):
+    for i in range(0, snp_num):
         if end_pt > num-3:
             num_list_x_start.append(start_pt)
             num_list_x_end.append(end_pt)
@@ -150,7 +168,7 @@ def split_data(data_df, window):
 
 
 
-def DNNmodel(numbering, ll):
+def DNNmodel(snp_num,numbering, ll):
     print(numbering,"-th iteration")
     real_y_num = ll.num_list_y_end[numbering]-ll.num_list_y_start[numbering]+1
 
@@ -177,7 +195,6 @@ def DNNmodel(numbering, ll):
     W = w1.dot(w2)
         # W = w1
     # The storage location of model W
-
     W.to_csv('../encrypted/'+str(ll.population)+'_DNNmodels/DNNmodels_' + str(ll.window_size) + '_c/W_New' + str(numbering)  + '.csv', header = False, index =False)
     
     del W
@@ -195,166 +212,177 @@ def DNNmodel(numbering, ll):
 # for numbering in range(1666, 82548):
 # This can be changed according to your SNP data.
 
-def DNNmodel_multiprocessing_16(ll):
-    # multiprocessing number can be changed. our setting is 16.
-    for i in range(0,5055):
-        n1 = 1666+16*i
-        n2 = n1+1
-        n3 = n1+2
-        n4 = n1+3
-        n5 = n1+4
-        n6 = n1+5
-        n7 = n1+6
-        n8 = n1+7
-        n9 = n1+8
-        n10 = n1+9
-        n11 = n1+10
-        n12 = n1+11
-        n13 = n1+12
-        n14 = n1+13
-        n15 = n1+14
-        n16 = n1+15       
-        procs = []
-        procs.append(Process(target=DNNmodel, args=(n1,ll)))
-        procs.append(Process(target=DNNmodel, args=(n2,ll)))
-        procs.append(Process(target=DNNmodel, args=(n3,ll)))
-        procs.append(Process(target=DNNmodel, args=(n4,ll)))
-        procs.append(Process(target=DNNmodel, args=(n5,ll)))
-        procs.append(Process(target=DNNmodel, args=(n6,ll)))
-        procs.append(Process(target=DNNmodel, args=(n7,ll)))
-        procs.append(Process(target=DNNmodel, args=(n8,ll)))
-        procs.append(Process(target=DNNmodel, args=(n9,ll)))
-        procs.append(Process(target=DNNmodel, args=(n10,ll)))
-        procs.append(Process(target=DNNmodel, args=(n11,ll)))
-        procs.append(Process(target=DNNmodel, args=(n12,ll)))
-        procs.append(Process(target=DNNmodel, args=(n13,ll)))
-        procs.append(Process(target=DNNmodel, args=(n14,ll)))
-        procs.append(Process(target=DNNmodel, args=(n15,ll)))
-        procs.append(Process(target=DNNmodel, args=(n16,ll)))        
+def DNNmodel_multiprocessing(thread, ll):
+    divide_by_thread = (ll.snp_num - 1) // thread + 1
+    for i in range(divide_by_thread):
+        num = [thread * i + j for j in range(thread)]
+        procs = [Process(target=DNNmodel, args=(ll.snp_num,n,ll)) for n in num]
         for p in procs:
             p.start()
         for p in procs:
             p.join()
 
-    procs = []
-    n1=82546
-    n2=82547
-    n3=82548
-    procs.append(Process(target=DNNmodel, args=(n1,ll)))
-    procs.append(Process(target=DNNmodel, args=(n2,ll)))
-    procs.append(Process(target=DNNmodel, args=(n3,ll)))
-    for p in procs:
-        p.start()
-    for p in procs:
-        p.join()
+# def DNNmodel_multiprocessing_16(ll):
+#     # multiprocessing number can be changed. our setting is 16.
+#     for i in range(0,5055):
+#         n1 = 1666+16*i
+#         n2 = n1+1
+#         n3 = n1+2
+#         n4 = n1+3
+#         n5 = n1+4
+#         n6 = n1+5
+#         n7 = n1+6
+#         n8 = n1+7
+#         n9 = n1+8
+#         n10 = n1+9
+#         n11 = n1+10
+#         n12 = n1+11
+#         n13 = n1+12
+#         n14 = n1+13
+#         n15 = n1+14
+#         n16 = n1+15       
+#         procs = []
+#         procs.append(Process(target=DNNmodel, args=(n1,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n2,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n3,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n4,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n5,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n6,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n7,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n8,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n9,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n10,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n11,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n12,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n13,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n14,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n15,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n16,ll)))        
+#         for p in procs:
+#             p.start()
+#         for p in procs:
+#             p.join()
+
+#     procs = []
+#     n1=82546
+#     n2=82547
+#     n3=82548
+#     procs.append(Process(target=DNNmodel, args=(n1,ll)))
+#     procs.append(Process(target=DNNmodel, args=(n2,ll)))
+#     procs.append(Process(target=DNNmodel, args=(n3,ll)))
+#     for p in procs:
+#         p.start()
+#     for p in procs:
+#         p.join()
 
 
-def DNNmodel_multiprocessing_8(ll):
-    # multiprocessing number can be changed. our setting is 16.
-    for i in range(0,10110):
-        n1 = 1666+8*i
-        n2 = n1+1
-        n3 = n1+2
-        n4 = n1+3
-        n5 = n1+4
-        n6 = n1+5
-        n7 = n1+6
-        n8 = n1+7
-        procs = []
-        procs.append(Process(target=DNNmodel, args=(n1,ll)))
-        procs.append(Process(target=DNNmodel, args=(n2,ll)))
-        procs.append(Process(target=DNNmodel, args=(n3,ll)))
-        procs.append(Process(target=DNNmodel, args=(n4,ll)))
-        procs.append(Process(target=DNNmodel, args=(n5,ll)))
-        procs.append(Process(target=DNNmodel, args=(n6,ll)))
-        procs.append(Process(target=DNNmodel, args=(n7,ll)))
-        procs.append(Process(target=DNNmodel, args=(n8,ll)))
-        for p in procs:
-            p.start()
-        for p in procs:
-            p.join()
+# def DNNmodel_multiprocessing_8(ll):
+#     # multiprocessing number can be changed. our setting is 16.
+#     for i in range(0,10110):
+#         n1 = 1666+8*i
+#         n2 = n1+1
+#         n3 = n1+2
+#         n4 = n1+3
+#         n5 = n1+4
+#         n6 = n1+5
+#         n7 = n1+6
+#         n8 = n1+7
+#         procs = []
+#         procs.append(Process(target=DNNmodel, args=(n1,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n2,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n3,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n4,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n5,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n6,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n7,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n8,ll)))
+#         for p in procs:
+#             p.start()
+#         for p in procs:
+#             p.join()
 
-    procs = []
-    n1=82546
-    n2=82547
-    n3=82548
-    procs.append(Process(target=DNNmodel, args=(n1,ll)))
-    procs.append(Process(target=DNNmodel, args=(n2,ll)))
-    procs.append(Process(target=DNNmodel, args=(n3,ll)))
-    for p in procs:
-        p.start()
-    for p in procs:
-        p.join()
+#     procs = []
+#     n1=82546
+#     n2=82547
+#     n3=82548
+#     procs.append(Process(target=DNNmodel, args=(n1,ll)))
+#     procs.append(Process(target=DNNmodel, args=(n2,ll)))
+#     procs.append(Process(target=DNNmodel, args=(n3,ll)))
+#     for p in procs:
+#         p.start()
+#     for p in procs:
+#         p.join()
 
-def DNNmodel_multiprocessing_4(ll):
-    # multiprocessing number can be changed. our setting is 16.
-    for i in range(0,20220):
-        n1 = 1666+4*i
-        n2 = n1+1
-        n3 = n1+2
-        n4 = n1+3
-        procs = []
-        procs.append(Process(target=DNNmodel, args=(n1,ll)))
-        procs.append(Process(target=DNNmodel, args=(n2,ll)))
-        procs.append(Process(target=DNNmodel, args=(n3,ll)))
-        procs.append(Process(target=DNNmodel, args=(n4,ll)))
-        for p in procs:
-            p.start()
-        for p in procs:
-            p.join()
+# def DNNmodel_multiprocessing_4(ll):
+#     # multiprocessing number can be changed. our setting is 16.
+#     for i in range(0,20220):
+#         n1 = 1666+4*i
+#         n2 = n1+1
+#         n3 = n1+2
+#         n4 = n1+3
+#         procs = []
+#         procs.append(Process(target=DNNmodel, args=(n1,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n2,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n3,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n4,ll)))
+#         for p in procs:
+#             p.start()
+#         for p in procs:
+#             p.join()
 
-    procs = []
-    n1=82546
-    n2=82547
-    n3=82548
-    procs.append(Process(target=DNNmodel, args=(n1,ll)))
-    procs.append(Process(target=DNNmodel, args=(n2,ll)))
-    procs.append(Process(target=DNNmodel, args=(n3,ll)))
-    for p in procs:
-        p.start()
-    for p in procs:
-        p.join()
+#     procs = []
+#     n1=82546
+#     n2=82547
+#     n3=82548
+#     procs.append(Process(target=DNNmodel, args=(n1,ll)))
+#     procs.append(Process(target=DNNmodel, args=(n2,ll)))
+#     procs.append(Process(target=DNNmodel, args=(n3,ll)))
+#     for p in procs:
+#         p.start()
+#     for p in procs:
+#         p.join()
 
-def DNNmodel_multiprocessing_2(ll):
-    # multiprocessing number can be changed. our setting is 16.
-    for i in range(0,40441):
-        n1 = 1666+2*i
-        n2 = n1+1
-        procs = []
-        procs.append(Process(target=DNNmodel, args=(n1,ll)))
-        procs.append(Process(target=DNNmodel, args=(n2,ll)))
-        for p in procs:
-            p.start()
-        for p in procs:
-            p.join()
+# def DNNmodel_multiprocessing_2(ll):
+#     # multiprocessing number can be changed. our setting is 16.
+#     for i in range(0,40441):
+#         n1 = 1666+2*i
+#         n2 = n1+1
+#         procs = []
+#         procs.append(Process(target=DNNmodel, args=(n1,ll)))
+#         procs.append(Process(target=DNNmodel, args=(n2,ll)))
+#         for p in procs:
+#             p.start()
+#         for p in procs:
+#             p.join()
 
-    procs = []
-    n1=82548
-    procs.append(Process(target=DNNmodel, args=(n1,ll)))
-    for p in procs:
-        p.start()
-    for p in procs:
-        p.join()
+#     procs = []
+#     n1=82548
+#     procs.append(Process(target=DNNmodel, args=(n1,ll)))
+#     for p in procs:
+#         p.start()
+#     for p in procs:
+#         p.join()
 
-def DNNmodel_multiprocessing_1(ll):
-    # multiprocessing number can be changed. our setting is 16.
-    for i in range(1666,82549):
-        n1 = i
-        procs = []
-        procs.append(Process(target=DNNmodel, args=(n1,ll)))
-        for p in procs:
-            p.start()
-        for p in procs:
-            p.join()
+# def DNNmodel_multiprocessing_1(ll):
+#     # multiprocessing number can be changed. our setting is 16.
+#     for i in range(1666,82549):
+#         n1 = i
+#         procs = []
+#         procs.append(Process(target=DNNmodel, args=(n1,ll)))
+#         for p in procs:
+#             p.start()
+#         for p in procs:
+#             p.join()
 
 
 def main(argv):
     window_size = 0
     nthread = 0
+    lowMAF = False
     try:
-        opts, args = getopt.getopt(argv,"hp:w:n:",["population=","window_size=","nthread="])
+        opts, args = getopt.getopt(argv,"hp:w:n:l:",["population=","window_size=","nthread=","lowMAF="])
     except getopt.GetoptError:
-        print('python evaluation.py -p <population> -w <window_size> -n <nthread>')
+        print('python evaluation.py -p <population> -w <window_size> -n <nthread> -l <lowMAF>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
@@ -366,10 +394,13 @@ def main(argv):
             window_size = int(arg)
         elif opt in ("-n", "--nthread"):
             nthread = int(arg)
+        elif opt in ("-l", "--lowMAF"):
+            lowMAF = True
         
     print('Population is '+ str(population))
     print('Window_size is '+ str(window_size))
     print('The number of threads is '+ str(nthread))
+    print('lowMAF is '+ str(lowMAF))
 
     # Generate true label list for our personal experiment (Not Required for Real Evaluation)
 
@@ -379,33 +410,29 @@ def main(argv):
 
     # data_Y_2 = [data_Y_train, data_Y_test]
 
-    file_name = "data_mod/idash_local.csv"
-    ll = locationList(file_name, window_size, population)
-
-
     
+    ll = locationList(window_size, population, lowMAF)
 
-    if nthread == 16 :
-        DNNmodel_multiprocessing_16(ll)
-    elif nthread == 8:
-        DNNmodel_multiprocessing_8(ll)
-    elif nthread == 4:
-        DNNmodel_multiprocessing_4(ll)
-    elif nthread == 2:
-        DNNmodel_multiprocessing_2(ll)
-    elif nthread == 1:
-        DNNmodel_multiprocessing_1(ll)
+    if nthread in [1, 2, 4, 8, 16]:
+        DNNmodel_multiprocessing(nthread, ll)
     else:
         print("This number does not support multiprocessing.")
+   
+
+    # if nthread == 16 :
+    #     DNNmodel_multiprocessing_16(ll)
+    # elif nthread == 8:
+    #     DNNmodel_multiprocessing_8(ll)
+    # elif nthread == 4:
+    #     DNNmodel_multiprocessing_4(ll)
+    # elif nthread == 2:
+    #     DNNmodel_multiprocessing_2(ll)
+    # elif nthread == 1:
+    #     DNNmodel_multiprocessing_1(ll)
+    # else:
+    #     print("This number does not support multiprocessing.")
     
     
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-    
-    
-
-
-
-
-
