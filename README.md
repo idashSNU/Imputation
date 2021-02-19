@@ -6,8 +6,8 @@ This is a solution from the SNU team for privacy-preserving genotype imputation 
 ## Download Datasets
 
 At first, we need to download four datasets "Total", "EUR", "AMR" and "AFR". Please follow the steps below:
-1. Download original data files from [here](https://drive.google.com/drive/folders/1EVFLogAoqAajHxCBlen4vzy2Y0JbkpbU?usp=sharing) and save in folder `/data_origin`. 
-1. Download modified data files from [here](https://drive.google.com/drive/folders/15JNx48B-dUDoIr1eVNqegj2fmIMB9K9Y?usp=sharing) and save in folder `/plain/data_mod`.
+1. Download original data files from [here](https://drive.google.com/drive/folders/1lLynN5dyh9nyqYIrWt1Wm5kUCoqZE0Vs?usp=sharing) and save in folder `/data_origin`. 
+1. Download modified data files from [here](https://drive.google.com/drive/folders/1HfcYFgt0H3dFzdazVL0AjpQUwNVYuNjf?usp=sharing) and save in folder `/plain/data_mod`.
 
 * Total: `/data_origin/*.txt`, `/plain/data_mod/Total_mod/*.txt`
 * EUR: `/data_origin/*_EUR.txt`, `/plain/data_mod/EUR_mod/*.txt`
@@ -28,6 +28,11 @@ $ python New_gen_model_W.py -p <population> -w <window_size> -n <number_of_proce
 * `number_of_processes`: 1, 2, 4, 8, 16 
 
 The generated plain models will be saved in the `/encrypted/<population>_DNNmodels/DNNmodels_<window_size>_c` directory.
+
+### Model for Low Minor Allele Frequency data
+
+We have added the model for data with low minor allele frequency (MAF). This data consists of 117k number of target SNPs. To run with low MAF data, run New_gen_model_w_117k instead of original one and `population`=Total. Then, the generated plain models will be saved in the `/encrypted/Total_DNNmodels/DNNmodels_lowMAF_<window_size>` directory.
+
 
 ## Build ModHEaaN
 For the encryption of test data, we use the [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) library, which is a light-version implementation of the approximate HE scheme [CKKS](https://eprint.iacr.org/2016/421.pdf). Contrary to the original implementation of the [CKKS](https://eprint.iacr.org/2016/421.pdf) scheme [HEAAN](https://github.com/snucrypto/HEAAN), our [ModHEaaN](https://github.com/idashSNU/Imputation/tree/master/ModHEaaN) library does not have any dependency on multi-precision libraries GMP and NTL, and only supports homomorphic addition and 1-depth constant multiplication (hence bootstrapping disabled).
@@ -56,12 +61,15 @@ $ cd ./encrypted/impute_dnn
 $ ./enc_impute <window_size> <number_of_targetSNP>
 ```
 * window_size: 8, 16, 24, 32, 40, 48, 56, 64, 72
-* number_of_targetSNP: 20, 40, 80
+* number_of_targetSNP: 20, 40, 80, 117
 
 For instance, The argument below runs the genotype imputation of 80k target SNPs, with window size 40.
 ```bash
 $ ./enc_impute 40 80
 ```
+
+When you want to deal with low MAF data, define `number_of_targetSNP` = 117, then the other parameters are the same as original `Total` data.
+
 ### For EUR/AMR/AFR Dataset
 In the case of EUR/AMR/AFR Dataset, the command line is fixed as 
 ```bash

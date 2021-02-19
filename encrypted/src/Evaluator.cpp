@@ -111,6 +111,8 @@ void Evaluator::computeScore_newdata(Message*** dec_XW, string* snp_data, long d
         output_filename += "_40k";
     } else if (snp_params.num_target_snp > 70000 && snp_params.num_target_snp < 90000) {
         output_filename += "_80k";
+    } else {
+        output_filename += "_117k";
     }
     output_filename += ".csv";
     fout.open(output_filename);
@@ -662,6 +664,7 @@ void Evaluator::readW_nosave(long datatype, long data_version, SNP_Parameters sn
 {
     // NTL_EXEC_RANGE(snp_params.num_target_snp, first, last);
     string population_names[3] = {"AFR", "AMR", "EUR"};
+    cout << "[Evaluator::readW_nosave] num_target_snp = " << snp_params.num_target_snp << endl;
 #pragma omp parallel for
     for (int i = 0; i < snp_params.num_target_snp; i++) {
         string input_filename;
@@ -670,9 +673,11 @@ void Evaluator::readW_nosave(long datatype, long data_version, SNP_Parameters sn
         } else if (population != 0) {
             input_filename = "../" + population_names[population - 1] + "_DNNmodels/DNNmodels_" + to_string(snp_params.window) + "_c/W_New" + to_string(i + 1666) + ".csv";
         } else {
-            input_filename = "../Total_DNNmodels/DNNmodels_" + to_string(snp_params.window) + "_c/W_New" + to_string(i + 1666) + ".csv";
-            // input_filename = "../../../idash2019_final/enc/Total_DNNmodels/DNNmodels_48_epoc50_0.2/W_New" + to_string(i + 1666) + ".csv";
-            // input_filename = "../../../idash2019_final/enc/EXP_DNNmodels/DNNmodels_" + to_string(snp_params.window) + "_epoc40/W_New" + to_string(i + 1666) + ".csv";
+            if (snp_params.num_target_snp_k <= 80) {
+                input_filename = "../Total_DNNmodels/DNNmodels_" + to_string(snp_params.window) + "/W_New" + to_string(i + 1666) + ".csv";
+            } else {
+                input_filename = "../Total_DNNmodels/DNNmodels_" + to_string(snp_params.window) + "/W_New" + to_string(i) + ".csv";
+            }
         }
         if (i == 0) cout << "readW from " << input_filename << endl;
 	    FileReader::readMatrix(input_filename, W[i], 0, ',', 0);

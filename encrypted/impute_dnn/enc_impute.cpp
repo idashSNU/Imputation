@@ -18,22 +18,24 @@ void runEvaluation(Evaluator& evaluator, string tag_filename, SNP_Parameters& sn
     
     cout << "[runEvaluation] Read W with datatype " << datatype << ", data_version " << data_version << ", snp_params.num_sample = " << snp_params.num_sample << endl;
     double*** W = new double**[snp_params.num_target_snp];
-#pragma omp parallel for
+    #pragma omp parallel for
     for (int i = 0; i < snp_params.num_target_snp; i++) {
-    	W[i] = new double*[snp_params.list_nSNP_tag[i]];
-    	for (int k = 0; k < snp_params.list_nSNP_tag[i]; k++) {
-    	    W[i][k] = new double[snp_params.list_nSNP_target[i]];
-    	}
+        W[i] = new double*[snp_params.list_nSNP_tag[i]];
+        for (int k = 0; k < snp_params.list_nSNP_tag[i]; k++) {
+            W[i][k] = new double[snp_params.list_nSNP_target[i]];
+        }
     }
     evaluator.readW_nosave(datatype, data_version, snp_params, population, W);
-    
-    // timeutils_tot.start("Encrypted Imputation_nosave");
     
     timeutils.start("EncryptX_imag_nosave");
     Ciphertext** EncX = new Ciphertext*[(3 * snp_params.num_tag_snp + 1) / 2];
     evaluator.encryptX_imag_nosave_newdata(mat_X, snp_params, EncX);
     timeutils.stop("EncryptX_imag_nosave");
-  
+
+    for (int i = 0; i < num_sample__; i++) {
+        delete[] mat_X[i];
+    }
+    delete[] mat_X;
 
     timeutils.start("compute_XW_imag_nosave");
     Ciphertext*** EncXW = new Ciphertext**[snp_params.num_target_snp];
@@ -41,27 +43,19 @@ void runEvaluation(Evaluator& evaluator, string tag_filename, SNP_Parameters& sn
     timeutils.stop("compute_XW_imag_nosave");
     
     for (int i = 0; i < snp_params.num_target_snp; i++) {
-	for (int j = 0; j < snp_params.list_nSNP_tag[i]; j++) {
-	    delete[] W[i][j];
-	}
-    	delete[] W[i];
+        for (int j = 0; j < snp_params.list_nSNP_tag[i]; j++) {
+            delete[] W[i][j];
+        }
+        delete[] W[i];
     }
     delete[] W;
-	
+    
     for (int i = 0; i < (3 * snp_params.num_tag_snp + 1) / 2; i++) {
-	delete[] EncX[i];
+        delete[] EncX[i];
     }
     delete[] EncX;
 
-    // result_matrix = new Message**[snp_params.num_target_snp];
-    // for (int i = 0; i < snp_params.num_target_snp; i++) {
-    // 	dec_XW[i] = new Message*[snp_params.list_nSNP_target[i]];
-    // }
-    // timeutils.start("Decrypt XW");
     evaluator.decryptXW_nosave_newdata(result_matrix, EncXW, snp_params);
-    // timeutils.stop("Decrypt XW");
-
-   //  timeutils_tot.stop("Encrypted Imputation_nosave");
 }
 
 int main(int argc, char* argv[])
@@ -88,7 +82,7 @@ int main(int argc, char* argv[])
     long logp = 17;
     long max_num_sample = 1024;
     
-    long window = 40;
+    long window;
     string mode; 
 
     if(!population)
@@ -138,7 +132,11 @@ int main(int argc, char* argv[])
         // snp_params.num_target_snp = 80882;
 
     } else {
-        tag_filename = "../../data_origin/tag_testing.txt"; // Evaluator guys have to change here
+        if (num_target_snp_k <= 80) {
+            tag_filename = "../../data_origin/tag_testing_80k.txt"; // Evaluator guys have to change here
+        } else {
+            tag_filename = "../../data_origin/tag_testing_117k.txt"; // Evaluator guys have to change here
+        }
         cout << "check filename = " << tag_filename << endl;
         snp_params.num_sample = 1004;
         num_sample__ = snp_params.num_sample;
@@ -148,7 +146,11 @@ int main(int argc, char* argv[])
     if (olddata) {
         Ylength = 500;
     } else { // population or newData
-        Ylength = 83072;
+        if (num_target_snp_k <= 80) {
+            Ylength = 83072;
+        } else {
+	        Ylength = 117904;
+        }
     }
 
     Message*** dec_XW = new Message**[snp_params.num_target_snp];
@@ -194,7 +196,6 @@ int main(int argc, char* argv[])
     cout << "Peak Memory Usage after Genotype Imputation: " << peakmemory << "MB" << endl;
     cout << "------------------" << endl;
 
-
     cout << "Save genotype score matrix as csv files in order to get result via micro AUC" << endl;
     string target_filename;
     string target_filename_AFR, target_filename_AMR, target_filename_EUR;
@@ -225,11 +226,15 @@ int main(int argc, char* argv[])
         cout << "read target in " << target_filename_EUR << endl;
         FileReader::readMatrix(target_filename_EUR, mat_Y_EUR, 0, '\t', 0);
     } else {
-        target_filename = "../../data_origin/target_testing.txt";
+        if (num_target_snp_k <= 80) {
+            target_filename = "../../data_origin/target_testing_80k.txt";
+        } else {
+            target_filename = "../../data_origin/target_testing_117k.txt";
+        }
         cout << "read target in " << target_filename << endl;
         FileReader::readMatrix(target_filename, mat_Y, 0, '\t', 0);
     }
-    
+
 
     cout << "set snp_data" << endl;
     string* snp_data = new string[snp_params.num_target_snp];
@@ -243,7 +248,12 @@ int main(int argc, char* argv[])
         }
     } else {
     	for (int i = 0; i < snp_params.num_target_snp; i++) {
-        	snp_data[i] = mat_Y[i + 1666][3];
+            if (num_target_snp_k <= 80) {
+        	    snp_data[i] = mat_Y[i + 1666][3];
+            }
+            else {
+                snp_data[i] = mat_Y[i][3];
+            }
         }
     }
     
