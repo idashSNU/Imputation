@@ -673,7 +673,7 @@ void Evaluator::readW_nosave(long datatype, long data_version, SNP_Parameters sn
         } else if (population != 0) {
             input_filename = "../" + population_names[population - 1] + "_DNNmodels/DNNmodels_" + to_string(snp_params.window) + "_c/W_New" + to_string(i + 1666) + ".csv";
         } else {
-            if (num_target_snp_k <= 80) {
+            if (snp_params.num_target_snp_k <= 80) {
                 input_filename = "../Total_DNNmodels/DNNmodels_" + to_string(snp_params.window) + "/W_New" + to_string(i + 1666) + ".csv";
             } else {
                 input_filename = "../Total_DNNmodels/DNNmodels_" + to_string(snp_params.window) + "/W_New" + to_string(i) + ".csv";
